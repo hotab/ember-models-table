@@ -125,6 +125,14 @@ export default ModelsTable.extend({
     return Math.min(pageMax, itemsCount);
   }),
 
+  pageSizeInit: computed('pageSizeOnInit', function() {
+    return get(this, 'pageSizeOnInit') || 10;
+  }),
+
+  currentPageNumberInit:  computed('currentPageNumberOnInit', function() {
+    return get(this, 'currentPageNumberOnInit') || 1;
+  }),
+
   /**
    * This function actually loads the data from the server.
    * It takes the store, modelName and query from the passed in data-object and adds page, sorting & filtering to it.
@@ -238,6 +246,7 @@ export default ModelsTable.extend({
       let currentPageNumber = get(this, 'currentPageNumber');
       if (pagesCount > currentPageNumber) {
         this.incrementProperty('currentPageNumber');
+        this.userInteractionObserver();
       }
     },
 
@@ -272,8 +281,19 @@ export default ModelsTable.extend({
 
   },
 
+  init() {
+    this._super(...arguments);
+    set(this, 'pageSize', parseInt(get(this, 'pageSizeInit'), 10));
+    set(this, 'currentPageNumber',  parseInt(get(this, 'currentPageNumberInit'),10));
+  },
+
   didReceiveAttrs() {
     set(this, 'filteredContent', get(this, 'data'));
+
+    //if content is less or eq pageSize then there is no need to store setted on init currentPageNumber
+    if (get(this, 'arrangedContentLength') <= get(this, 'pageSize')) {
+      set(this, 'currentPageNumber', 1);
+    }
   },
 
   _addPropertyObserver() {
