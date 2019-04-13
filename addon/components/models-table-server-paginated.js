@@ -290,9 +290,22 @@ export default ModelsTable.extend({
   didReceiveAttrs() {
     set(this, 'filteredContent', get(this, 'data'));
 
-    //if content is less or eq pageSize then there is no need to store setted on init currentPageNumber
-    if (get(this, 'arrangedContentLength') <= get(this, 'pageSize')) {
-      set(this, 'currentPageNumber', 1);
+    let currentPageNumber = get(this, 'currentPageNumber');
+    let pageSize = get(this, 'pageSize');
+    if(currentPageNumber !== 1){
+      //if content is less or eq pageSize then there is no need to store setted on init currentPageNumber
+      if (get(this, 'arrangedContentLength') <= pageSize) {
+        set(this, 'currentPageNumber', 1);
+        this.userInteractionObserver();
+      } else {
+        //If currentPageNumber is out of range for new content, we will set pageNumber as max possible for new content
+        if (currentPageNumber * pageSize > get(this, 'arrangedContentLength')) {
+          console.log("newPageNumber")
+          let newPageNumber = Math.ceil(get(this, 'arrangedContentLength') / pageSize);
+          set(this, 'currentPageNumber', newPageNumber);
+          this.userInteractionObserver();
+        }
+      }
     }
   },
 
