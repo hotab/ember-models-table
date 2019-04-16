@@ -256,6 +256,7 @@ export default ModelsTable.extend({
       }
       let pagesCount = get(this, 'pagesCount');
       set(this, 'currentPageNumber', pagesCount);
+      this.userInteractionObserver();
     },
 
     sort (column) {
@@ -299,9 +300,8 @@ export default ModelsTable.extend({
         this.userInteractionObserver();
       } else {
         //If currentPageNumber is out of range for new content, we will set pageNumber as max possible for new content
-        if (currentPageNumber * pageSize > get(this, 'arrangedContentLength')) {
-          console.log("newPageNumber")
-          let newPageNumber = Math.ceil(get(this, 'arrangedContentLength') / pageSize);
+        if (currentPageNumber  > get(this, 'pagesCount')) {
+          let newPageNumber = get(this, 'pagesCount');
           set(this, 'currentPageNumber', newPageNumber);
           this.userInteractionObserver();
         }
